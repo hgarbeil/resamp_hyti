@@ -1,0 +1,20 @@
+Center lat and lon 19.4173  -155.434
+line	sample	lat 	lon
+0		0		19.4648	-155.897
+0		511		19.6261	-155.863
+11136	0		19.2865	-155.027
+
+dist across from (0,0) to (0,512)
+lat_dist = (19.6261 - 19.4648) * 110000. = 17743 m
+lon_dist = (-155.897 - 155.863) * 105000. = 3570 m
+DIST = 18099m
+dist_per_pixel across = 35.34 m / x pixel
+
+dist along track (0,0) to (11136, 0)  
+lat_dist = (19.4648 - 19.2865) * 110000. = 19613. m
+lon_dist = (155.897 - 155.027) * 105000.  = 91350. m
+DIST = 93431m 
+dist_per_pixel along track (DIST/11136) = 8.39m 
+
+
+
