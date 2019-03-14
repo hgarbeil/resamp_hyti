@@ -21,11 +21,12 @@ public:
 	int ReadEnviHeader (char *fname) ;
 	int GetMapInfo (char *fname, char *mapinfo) ;
 	void SetMapInfo (char *) ;
+	void Get_BIP_Band (char *, float *dat, int band) ;
 	CFileOperations();
 	virtual ~CFileOperations();
 
 	char filename [420], mapInfo[1024] ;
-
+	float *waves ;
 	int me2envi_dt [7] ;
 	int envi2me_dt [7] ;
 	int samps ;

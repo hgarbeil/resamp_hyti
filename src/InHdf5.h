@@ -29,6 +29,7 @@ public :
 	~InHdf5 () ;
 	void read_lines(int startl, int nl, float *fdat) ;
 	void get_image_size (int *dsize) ;
+	void dumpfull (float *) ;
 	void read_band (int, float *) ;
 	void read_geom (float *, float *) ;
 	void read_wavelengths (float *) ;

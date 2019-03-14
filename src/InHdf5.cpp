@@ -132,6 +132,25 @@ void InHdf5::get_geom_extent (float *llarr) {
 
 }
 
+void InHdf5::dumpfull (float *data) {
+	int i, ndims ;
+	hsize_t dims [5] ;
+	float *pixloc ;
+	DataSet dset ;
+	DataSpace dspace ;
+	H5T_class_t type_class ;
+	string dset_name ("/radiance_data") ;
+	dset = h5f->openDataSet (dset_name) ;
+	type_class = dset.getTypeClass() ;
+	
+	dspace = dset.getSpace () ;
+	ndims = dspace.getSimpleExtentDims (dims, NULL) ;
+	for (i=0; i<ndims; i++) {
+		cout << i<< "  " << dims[i] << endl ;
+	}
+
+	dset.read (data, PredType::NATIVE_FLOAT) ;
+}
 
 void InHdf5::get_image_size (int *mydims) {
 	int i, ndims ;

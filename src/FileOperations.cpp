@@ -27,6 +27,7 @@ CFileOperations::CFileOperations()
 	me2envi_dt [3] = 4 ;
 	me2envi_dt [4] = 6 ;
 	map_info_flag = true ;
+	waves = 0L ;
 }
 
 CFileOperations::~CFileOperations()
@@ -211,6 +212,7 @@ int CFileOperations::ReadEnviHeader(char *pathname)
 {
 
 	int  dt ;
+	bool getline ;
 	char linedat [440], *token, *newtoken ;
 
 	ifstream ifil (pathname, ios::in) ;
@@ -224,6 +226,7 @@ int CFileOperations::ReadEnviHeader(char *pathname)
 	while (!ifil.eof()){
 
 		ifil.getline (linedat, 440, '\n') ;
+		cout << linedat<< endl ;
 		if (strlen (linedat) < 2 && ifil.eof()) break ;
 		if (strlen (linedat)< 2) continue ;
 		token = strtok (linedat, "=") ;
@@ -255,6 +258,31 @@ int CFileOperations::ReadEnviHeader(char *pathname)
 			if (!strncmp(token, "bsq",3)) bform = 0 ;
 			if (!strncmp(token, "bil",3)) bform = 1 ;
 			if (!strncmp(token, "bip",3)) bform = 2 ;
+		}
+
+		if (!strncmp (token, "wavelength", 10)){
+			waves = new float [bands] ;
+			token = strtok (NULL, "{") ;
+			
+			getline = true ;
+			int i = 0 ; // count bands read in	
+			while (i < bands){
+				if (getline){
+					ifil.getline (linedat, 440,'\n') ;
+					token = strtok(linedat, ",\n}") ;
+				}
+				else
+					token = strtok (NULL, ",\n}") ;
+				if (token!=NULL){ 
+					getline = false ;
+					cout << "Wavelenght : " << token << endl ;
+					waves[i++] = atof (token) ;
+				}
+				else getline = true ;
+			}
+			//ifil.getline (linedat, 440,'\n') ;
+			//token = strtok (linedat, "}") ;
+			//waves[bands-1] = atof (token) ;
 		}
 
 
@@ -301,4 +329,23 @@ int  CFileOperations::GetMapInfo(char *pathname, char *mapinfo)
 	return (0) ;
 }
 
+void CFileOperations::Get_BIP_Band (char *dfile, float *outdat, int bnum) {
+
+	int i ;
+	int npix = samps * lines ;
+	float *indat = new float [bands] ;
+
+	// these can be quite large files, get the name of the data file, open it and 
+	// then extract desired band on a line by line basis
+	FILE *fdata = fopen (dfile, "rb") ;
+
+	for (i=0 ;i<npix; i++) {
+		fread (indat, 4, bands, fdata) ;
+		outdat[i] = indat[bnum] ;
+	}
+
+	fclose (fdata) ;
+	delete[]indat ;
+
+}
 

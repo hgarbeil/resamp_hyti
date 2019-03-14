@@ -1,6 +1,9 @@
 #include "Hyti_sim.h"
 #include "math.h"
 #include <iostream>
+#include <random>
+#include <chrono>
+#include <string>
 
 
 Hyti_sim::Hyti_sim () {
@@ -102,5 +105,47 @@ void Hyti_sim::get_geom (float center_lat, float center_lon, float *ymeters_deg,
 	return ;
 
 }	
+
+
+/***
+ * This routine reads the performance model output of polynomial coefficients 
+ * which relates temperature to the NEdT for a lens of 25C
+ ***/
+void Hyti_sim::load_noise (float *indat, float *outdat, float *noise, int bandnum, int npix) {
+
+	int i ;
+	float noisemax, tval, nval, *allcoefs = new float [4*25], *coefs ;
+	double total = 0. ;
+	unsigned seed = chrono::system_clock::now().time_since_epoch().count() ;
+
+	default_random_engine generator(seed);
+
+	FILE *fcoefs = fopen ("/hbeta/harold/workdir/resamp_hyti/PerfModel/outcoefs","r") ;
+	fread (allcoefs, 4, 4 * 25, fcoefs) ;
+	fclose (fcoefs) ;
+	coefs = allcoefs + 4 * bandnum ;
+	normal_distribution <double> distribution (0., 1.) ;
+	//uniform_real_distribution<double>distribution (-1.,1.) ;
+
+	for (i=0; i<npix; i++) {
+		tval = indat[i] ;
+		noisemax = coefs[0] + coefs[1] * tval + coefs[2] * tval * tval + 
+			coefs [3] * tval * tval * tval ;
+		//noisemax *=  ((bandnum+1) * .0093 + .6677) ;
+		noisemax *= .70 * (1. - bandnum/24.) ;
+		nval = distribution (generator) * noisemax   ;
+		noise[i] = nval ;
+		outdat[i] = tval + nval ;
+		total+= noisemax ;
+	}
+	total /= npix ;
+	cout << "For band : " << bandnum << "   Ave noise max : " << total << endl ;  
+
+}
+		
+
+
+		
+
 
 
